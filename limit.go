@@ -15,7 +15,7 @@ func (n *LimitNode) Next() bool {
 	return n.Parent.Next() && (n.Count < n.Limit)
 }
 
-func NewLimitNode(limit int, parent Node) *LimitNode {
+func NewLimitNode(parent Node, limit int) *LimitNode {
 	return &LimitNode{
 		Parent: parent,
 		Limit:  limit,

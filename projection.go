@@ -10,11 +10,7 @@ func (n *ProjectionNode) Execute() Row {
 
 	var entries []Entry
 	for _, c := range n.Columns {
-		for _, e := range row.Entries {
-			if e.Column == c {
-				entries = append(entries, Entry{c, e.Value})
-			}
-		}
+		entries = append(entries, row.Get(c))
 	}
 
 	return Row{Entries: entries}

@@ -28,7 +28,7 @@ func TestNewScanNode(t *testing.T) {
 func TestLimit(t *testing.T) {
 	sn, err := NewScanNode("movies")
 	check(t, err)
-	ln := NewLimitNode(5, sn)
+	ln := NewLimitNode(sn, 5)
 	query := NewQuery(ln)
 	rows := query.Execute()
 
@@ -41,11 +41,33 @@ func TestProjection(t *testing.T) {
 	sn, err := NewScanNode("movies")
 	check(t, err)
 	pn := NewProjectionNode(sn, []string{"movieId"})
-	ln := NewLimitNode(1, pn)
+	ln := NewLimitNode(pn, 1)
 	query := NewQuery(ln)
 	rows := query.Execute()
 
 	if len(rows[0].Entries) != 1 {
 		t.Fatalf("Wrong number of entries: %v", len(rows[0].Entries))
+	}
+}
+
+func TestSort(t *testing.T) {
+	scan, err := NewScanNode("movies")
+	check(t, err)
+	limit := NewLimitNode(scan, 5)
+	sort := NewSortNode(limit, "title", true)
+	query := NewQuery(sort)
+	rows := query.Execute()
+	if rows[0].Get("title").Value != "Father of the Bride Part II (1995)" {
+		t.Fatalf("Wrong sorting")
+	}
+
+	scan, err = NewScanNode("movies")
+	check(t, err)
+	sort = NewSortNode(scan, "title", true)
+	limit = NewLimitNode(sort, 10)
+	query = NewQuery(limit)
+	rows = query.Execute()
+	if rows[0].Get("title").Value != "\"Great Performances\" Cats (1998)" {
+		t.Fatalf("Wrong sorting")
 	}
 }
